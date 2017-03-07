@@ -1,7 +1,7 @@
-clear all;
-close all;
+% clear all;
+% close all;
 % signal length
-L=60;
+L=600;
 %initial value of m series
 x1=1;x2=1;x3=0;x4=0;
 %square wave signal
