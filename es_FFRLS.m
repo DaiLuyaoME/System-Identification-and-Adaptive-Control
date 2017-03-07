@@ -13,10 +13,10 @@ theta=[a(2:na+1);b];
 phi=zeros(L,na+nb+1);
 y=zeros(L,1);
 %forgetting factor
-lambda=0.95;
+lambda=0.99;
 
 %% calculation initiation
-n0=( numel(a)+numel(b) )+1;
+n0=( numel(a)+numel(b) )+4;
 
 for k=1:n0
     phi(k,:)=[-yk;uk(d:d+nb)]';
@@ -78,11 +78,25 @@ end
 % xlabel('k');
 
 %%
+close all;
+figure1 = figure;
+axes1 = axes('Parent',figure1);
+hold(axes1,'on');
 a1_es=theta_es(:,1);
-a2_es=theta_es(:,2);
-plot(a1_es);
+plot(a1_es,'Marker','.','LineWidth',1','DisplayName','${{\hat{a}}_{1}}$');
 hold on;
 a1=[ones(floor(L/2),1)*a(2);ones(L-floor(L/2),1)*theta(1)];
-plot(a1);
+plot(a1,'DisplayName','${{{a}}_{1}}$');
+xlabel('k','FontSize',20,'Interpreter','latex');
+ylabel('$\left| {{e}_{k}} \right|$','FontSize',20,'Interpreter','latex');
+% a2_es=theta_es(:,2);
+% plot(a2_es);
+% a2=[ones(floor(L/2),1)*a(3);ones(L-floor(L/2),1)*theta(2)];
+% plot(a2);
 
-    
+
+title('$\lambda =0.40$','FontSize',16,'Interpreter','latex');
+box(axes1,'on');
+% ´´½¨ legend
+legend1 = legend(axes1,'show');
+set(legend1,'Interpreter','latex','FontSize',20);
