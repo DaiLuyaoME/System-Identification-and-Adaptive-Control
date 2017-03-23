@@ -59,7 +59,7 @@ end
 
 %% 测量噪声
 %白噪声模块用的采用频率，需要大于系统的运行频率
-sigma = 10e-9;%噪声的标准差，单位m
+sigma = 5e-9;%噪声的标准差，单位m
 varNoise=sigma*sigma;%注意，白噪声的模块中的Noise Power 需要填成varNoise*Ts
 noisePower=varNoise*Ts;
 

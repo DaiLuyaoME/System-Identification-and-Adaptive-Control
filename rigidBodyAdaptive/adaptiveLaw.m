@@ -96,9 +96,12 @@ end
         global esMass;
         phi=u(1);
         y=u(2);
-        if (t<0.036 )
-            
-            
+        %         if (t<0.036 )
+        
+        global accEndTime;
+        global decStartTime;
+        global decEndTime;
+        if(t<accEndTime*0.9 && t>accEndTime*0.05 || t > decStartTime && t < decEndTime*0.98)
             
             if(numel(dataVector) == 20)
                 P=inv(dataMatrix'*dataMatrix);
@@ -110,7 +113,7 @@ end
                 esMass=esMass+R*(y-phi'*esMass)/lambda;
                 P=(eye(numel(phi))-R*phi')*P/lambda;
             else
-                if(abs(u(3))>1e-8)
+                if(abs(u(3))>4e-8)
                     dataMatrix=[dataMatrix;phi];
                     dataVector=[dataVector;y];
                 end
