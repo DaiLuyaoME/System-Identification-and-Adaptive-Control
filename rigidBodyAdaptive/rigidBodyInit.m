@@ -3,7 +3,7 @@ close all;
 clc;
 global esMass;
 
-esMass=24;%初始估计质量
+esMass=23;%初始估计质量
 m0=25;%真实质量
 fs=5000;%采样频率
 Ts=1/fs;%采样周期

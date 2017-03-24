@@ -101,7 +101,13 @@ end
         global accEndTime;
         global decStartTime;
         global decEndTime;
-        if(t<accEndTime*0.9 && t>accEndTime*0.05 || t > decStartTime && t < decEndTime*0.98)
+        global constantAccStartTime;
+        global constantAccEndTime;
+        global constantJerkStartTime;
+        global constantJerkEndTime;
+        %                 if( (t< (accEndTime*0.9) && (t>accEndTime*0.05)) || (t > decStartTime && t < (decEndTime*0.98)) )
+        if ( t>constantJerkStartTime && t < constantJerkEndTime || t>constantAccStartTime && t< constantAccEndTime )
+            %         if (  t>constantAccStartTime && t< constantAccEndTime )
             
             if(numel(dataVector) == 20)
                 P=inv(dataMatrix'*dataMatrix);

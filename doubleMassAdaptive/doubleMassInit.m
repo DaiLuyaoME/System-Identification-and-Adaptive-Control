@@ -20,8 +20,8 @@ Ts=1/fs;%采样周期
 % 前馈系数初始估计值
 m11=m1-1;
 m22=m2-0.5;
-coef(1)=m11*m22/k; % snap 前馈系数
-coef(2)=m11+m22; % 加速度前馈系数
+coef(1)=0; % snap 前馈系数
+coef(2)=24.96; % 加速度前馈系数
 
 %% 被控双质量块传递函数模型
 numGp=k;
@@ -89,7 +89,7 @@ switch flag
 end
 %% 测量噪声
 %白噪声模块用的采用频率，需要大于系统的运行频率
-sigma = 0e-9;%噪声的标准差，单位m
+sigma = 10e-9;%噪声的标准差，单位m
 varNoise=sigma*sigma;%注意，白噪声的模块中的Noise Power 需要填成varNoise*Ts
 noisePower=varNoise*Ts;
 

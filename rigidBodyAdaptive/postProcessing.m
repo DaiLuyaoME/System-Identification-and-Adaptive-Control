@@ -90,9 +90,19 @@ temp2=max(abs(acc.signals.values));
 ratio=0.5*temp1/temp2;
 plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
 legend(gca,'show');
-%%
-temp1=max(abs(esMass));
+%% 绘制估计质量与加速度的对比关系
+close;
+temp1=max(abs(esMass.data));
 temp2=max(abs(acc.signals.values));
-ratio=0.5*temp1/temp2;
-plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+ratio=0.2*temp1/temp2;
+plot(acc.time,20+ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+hold on;
+plot(esMass.time,esMass.data,'DisplayName','esMass','LineWidth',2);
 legend(gca,'show');
+%% 绘制不同加速度前馈系数下的误差对比图
+close;
+plot(err23.time,err23.signals.values,'LineWidth',2);
+hold on;
+plot(err23_5.time,err23_5.signals.values,'LineWidth',2);
+hold on;
+plot(err24.time,err24.signals.values,'LineWidth',2);
