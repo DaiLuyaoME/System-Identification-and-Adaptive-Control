@@ -90,9 +90,13 @@ function sys=mdlOutputs(t,x,u)
 % u(4)=vel;
 
 global coef;
+global m11;
+global m22;
+global k;
 %         fprintf('u is %f',u);
 temp=[u(1);u(3)];
-sys=coef'*temp;
+% sys=coef'*temp;
+sys=[m11*m22/k,coef(2)]*temp;
 % count=count+1;
 
 

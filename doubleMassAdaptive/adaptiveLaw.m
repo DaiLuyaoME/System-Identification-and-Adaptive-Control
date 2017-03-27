@@ -90,7 +90,7 @@ end
         %u(3)=acc_acc
         %u(4)=vel_acc
         %u(5)=Fc
-        %u(6)=err 
+        %u(6)=err
         
         global P;
         global R;
@@ -99,28 +99,35 @@ end
         global lambda;
         global coef;
         global k;
+        global constantAccStartTime;
+        global constantAccEndTime;
+        global constantJerkStartTime;
+        global constantJerkEndTime;
         phi=[u(1);u(3)];
         y=u(5);
-        if (t>0.005 && t<0.044)
-        if(numel(dataVector) == 20)
-            P=inv(dataMatrix'*dataMatrix);
-            coef=P*dataMatrix'*dataVector;
-            dataMatrix=[dataMatrix;phi'];
-            dataVector=[dataVector;y];
-        elseif(numel(dataVector)>20)
-            R=P*phi/(lambda+phi'*P*phi);
-            coef=coef+R*(y-phi'*coef)/lambda;
-            P=(eye(numel(phi))-R*phi')*P/lambda;
-        else
-            if(abs(u(6))>1e-8)
+        %         if ( t>constantJerkStartTime && t < constantJerkEndTime || t>constantAccStartTime && t< constantAccEndTime )
+        %         if (  t>constantAccStartTime && t< constantAccEndTime )
+        if (  t> constantAccStartTime && t< constantAccEndTime )
+            if(numel(dataVector) == 20)
+                P=inv(dataMatrix'*dataMatrix);
+                coef=P*dataMatrix'*dataVector;
                 dataMatrix=[dataMatrix;phi'];
                 dataVector=[dataVector;y];
+            elseif(numel(dataVector)>20)
+                R=P*phi/(lambda+phi'*P*phi);
+                coef=coef+R*(y-phi'*coef)/lambda;
+                P=(eye(numel(phi))-R*phi')*P/lambda;
+            else
+                if(abs(u(6))>1e-8)
+                    dataMatrix=[dataMatrix;phi'];
+                    dataVector=[dataVector;y];
+                end
             end
-        end
         end
         sys(1) = coef(1);
         sys(2) = coef(2);
     end
+
 % end mdlOutputs
 
 %
@@ -148,8 +155,8 @@ end
     function sys=mdlTerminate(t,x,u)
         global dataMatrix;
         global dataVector;
-        dataMatrix=[];
-        dataVector=[];
+%         dataMatrix=[];
+%         dataVector=[];
         sys = [];
     end
 
