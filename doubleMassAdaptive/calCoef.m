@@ -3,7 +3,7 @@ tempErr=leadErr.signals.values;
 tempAcc=acc.signals.values;
 tempErr=tempErr(leadErr.time>0.044 & leadErr.time<0.048);
 tempAcc=tempAcc(leadErr.time>0.044 & leadErr.time<0.048);
-mf=24;
+mf=24.5;
 mass=mf+mean(tempErr)*dcgain(sysc)/mean(tempAcc)
 
 %% 学习snap前馈系数

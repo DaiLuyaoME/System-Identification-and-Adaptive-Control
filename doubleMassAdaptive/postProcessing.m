@@ -25,9 +25,9 @@ hold on;
 
 temp1=max(abs(pidErr.signals.values));
 temp2=max(abs(acc.signals.values));
-ratio=0.5*temp1/temp2;
+ratioAcc=0.5*temp1/temp2;
 
-plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
 
 % 创建 legend
 legend1 = legend(gca,'show');
@@ -46,8 +46,8 @@ hold on;
 
 temp1=max(abs(Err.signals.values));
 temp2=max(abs(acc.signals.values));
-ratio=0.5*temp1/temp2;
-plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+ratioAcc=0.5*temp1/temp2;
+plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
 legend(gca,'show');
 
 % temp1=max(abs(pidErr.signals.values));
@@ -55,6 +55,49 @@ legend(gca,'show');
 % % ratio=0.5*temp1/temp2;
 % plot(feedbackForce.time,ratio*feedbackForce.signals.values,'DisplayName','Feedback Force','LineWidth',2);
 % legend(gca,'show');
+%% 绘制误差 加速度轨迹 snap
+close all;
+disName={'PID Error',' ',' ','leadErr'};
+switch controllerFlag
+    case 1
+        Err=pidErr;
+    case 4
+        Err=leadErr;
+end
+
+plotError(Err.time,Err.signals.values,disName{controllerFlag});
+hold on;
+% plot(noise.time,noise.signals.values,'DisplayName','noise','LineWidth',2);
+temp1=max(abs(Err.signals.values));
+temp2=max(abs(acc.signals.values));
+temp3=max(abs(snap.signals.values));
+ratioAcc=0.5*temp1/temp2;
+ratioSnap=temp1/temp3;
+plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','scaled acceleration','LineWidth',3);
+plot(snap.time,ratioSnap*snap.signals.values,'DisplayName','scaled snap','LineWidth',3);
+legend(gca,'show');
+
+% temp1=max(abs(pidErr.signals.values));
+% % temp2=max(abs(feedbackForce.signals.values));
+% % ratio=0.5*temp1/temp2;
+% plot(feedbackForce.time,ratio*feedbackForce.signals.values,'DisplayName','Feedback Force','LineWidth',2);
+% legend(gca,'show');
+%% plot snap acc dis
+close all;
+plot(dis.time,dis.signals.values,'DisplayName','trajectory','LineWidth',2);
+hold on;
+temp1=max(abs(dis.signals.values));
+temp2=max(abs(acc.signals.values));
+temp3=max(abs(snap.signals.values));
+ratioAcc=0.5*temp1/temp2;
+ratioSnap=0.5*temp1/temp3;
+plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','scaled acceleration','LineWidth',2);
+plot(snap.time,ratioSnap*snap.signals.values,'DisplayName','scaled snap','LineWidth',2);
+legend(gca,'show');
+xlabel('$Time\left( s \right)$','Interpreter','latex','FontSize',20);
+
+ylabel('$r\left( t \right)\left( m \right)$','Interpreter','latex','FontSize',20);
+
 %% 计算建立时间
 len=numel(acc.time);
 err=Err.signals.values;
@@ -78,8 +121,8 @@ plotError(leadErr.time,leadErr.signals.values,disName{2});
 hold on;
 temp1=max(abs(leadErr.signals.values));
 temp2=max(abs(acc.signals.values));
-ratio=0.5*temp1/temp2;
-plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+ratioAcc=0.5*temp1/temp2;
+plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
 legend(gca,'show');
 
 %%
@@ -87,15 +130,15 @@ hold on;
 
 temp1=max(abs(Err.signals.values));
 temp2=max(abs(acc.signals.values));
-ratio=0.5*temp1/temp2;
-plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+ratioAcc=0.5*temp1/temp2;
+plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
 legend(gca,'show');
 %% 绘制估计质量与加速度的对比关系
 close;
 temp1=max(abs(esMass.data));
 temp2=max(abs(acc.signals.values));
-ratio=0.2*temp1/temp2;
-plot(acc.time,20+ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+ratioAcc=0.2*temp1/temp2;
+plot(acc.time,20+ratioAcc*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
 hold on;
 plot(esMass.time,esMass.data,'DisplayName','esMass','LineWidth',2);
 legend(gca,'show');
