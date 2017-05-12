@@ -7,7 +7,7 @@ Ts=1/fs;%采样周期
 %% 生成被控对象模型
 % flag == 1 刚体模型
 % flag == 2 双质量块模型
-modelType=1;
+modelType=2;
 switch modelType
     case 1
         mass=25;
