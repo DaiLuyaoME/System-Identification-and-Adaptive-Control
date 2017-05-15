@@ -10,5 +10,5 @@ Gp=Gp1*Gp2;
 %%
 sisotool(Gp);
 %%
-pd = tf(pd);
-save pd.mat pd;
+pdDoubleMass = tf(pd);
+save pdDoubleMass.mat pdDoubleMass;

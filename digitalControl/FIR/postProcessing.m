@@ -48,7 +48,7 @@ legend(gca,'show');
 %% 绘制指定时间段误差和加速度轨迹
 close;
 time=Err.time;
-index=time>0.1 & time < 0.2;
+index=time>0.043 & time < 0.053;
 plotError(time(index),Err.signals.values(index)*1e9,'控制误差');
 hold on;
 
@@ -58,7 +58,7 @@ ratio=0.5*temp1/temp2;
 plot(time(index),ratio*acc.signals.values(index),'DisplayName','Acceleration','LineWidth',2);
 plot(time(index),noise.signals.values(index)*1e9,'DisplayName','Noise','LineWidth',2);
 legend(gca,'show');
-
+axis tight;
 
 %%
 close all;

@@ -4,7 +4,7 @@ switch flag
     case 1 % pid¿ØÖÆÆ÷
         
         
-        fbw=120; % desired bandwidth/Hz
+        fbw=80; % desired bandwidth/Hz
         alpha=3; % ratio
         kp=(2*pi*fbw)^2/alpha; %proportional gain
         fi=fbw/alpha^2;% integrator frequency
