@@ -8,29 +8,35 @@ Ts=1/fs;%采样周期
 %% 生成被控对象模型
 % flag == 1 刚体模型
 % flag == 2 双质量块模型
-modelType=1;
+modelType=2;
 switch modelType
     case 1
         mass=25;
         totalMass=mass;
         fr=0;
         Gp = createPlantModel(mass,fr,modelType);
-        %         load pd.mat;
+                load pd.mat;
     case 2
         mass=[20,5];
         totalMass=sum(mass);
         fr=700;
         Gp = createPlantModel(mass,fr,modelType);
-        %         load pdDoubleMass.mat;
-        %         pd=pdDoubleMass;
+                load pdDoubleMass.mat;
+                pd=pdDoubleMass;
+    case 3
+        totalMass=25;
+        fr=[700,1000];
+        Gp=createPlantModel(totalMass,fr,modelType);
+%         load pdTripleMass.mat;
+%         pd=pdTripleMass;
 end
 [numGp,denGp] = tfdata(Gp,'v');
 GpDis = c2d(Gp,Ts,'zoh');
 [numGpDis,denGpDis] = tfdata(GpDis,'v');
 %% 反馈控制器设计
 controllerFlag=2;
-Gc = totalMass*createFeedbackController(controllerFlag);
-% Gc = totalMass*tf(pd);
+% Gc = totalMass*createFeedbackController(controllerFlag);
+Gc = totalMass*tf(pd);
 GcDis = c2d(Gc,Ts,'tustin');
 [numGc,denGc] = tfdata(Gc,'v');
 [numGcDis,denGcDis] = tfdata(GcDis,'v');
