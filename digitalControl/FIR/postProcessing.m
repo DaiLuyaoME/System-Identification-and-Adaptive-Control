@@ -38,11 +38,12 @@ disName={'PID Error','leadErr'};
 
 plotError(Err.time,Err.signals.values*1e9,'控制误差');
 hold on;
-
+plotError(noise.time,noise.signals.values*1e9,'噪声');
 temp1=max(abs(Err.signals.values*1e9));
 temp2=max(abs(acc.signals.values));
 ratio=0.5*temp1/temp2;
 plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+
 legend(gca,'show');
 
 %% 绘制指定时间段误差和加速度轨迹

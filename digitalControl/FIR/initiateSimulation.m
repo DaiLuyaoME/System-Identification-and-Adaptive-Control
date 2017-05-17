@@ -8,7 +8,7 @@ Ts=1/fs;%采样周期
 %% 生成被控对象模型
 % flag == 1 刚体模型
 % flag == 2 双质量块模型
-modelType=2;
+modelType=1;
 switch modelType
     case 1
         mass=25;
@@ -28,12 +28,16 @@ end
 GpDis = c2d(Gp,Ts,'zoh');
 [numGpDis,denGpDis] = tfdata(GpDis,'v');
 %% 反馈控制器设计
-controllerFlag=1;
+controllerFlag=2;
 Gc = totalMass*createFeedbackController(controllerFlag);
-Gc = totalMass*tf(pd);
+% Gc = totalMass*tf(pd);
 GcDis = c2d(Gc,Ts,'tustin');
 [numGc,denGc] = tfdata(Gc,'v');
 [numGcDis,denGcDis] = tfdata(GcDis,'v');
+%% 前馈控制器设计
+% temp=dcgain(GpDis);
+F1=numGpDis/sum(numGpDis);
+F2=denGpDis/sum(numGpDis);
 %% 设置Simulink模型的传递函数
 % mode: 1 连续模式；2 离散模式
 mode=2;
