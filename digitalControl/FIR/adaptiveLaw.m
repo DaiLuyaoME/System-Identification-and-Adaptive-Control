@@ -1,53 +1,52 @@
 function [sys,x0,str,ts,simStateCompliance] = adaptiveLaw(t,x,u,flag)
 
 switch flag
-
-  case 0
-    [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes;
-
-  case 1
-    sys=mdlDerivatives(t,x,u);
-
-%   case 2
-%     sys=mdlUpdate(t,x,u);
-
-  case 3
-    sys=mdlOutputs(t,x,u);
-
-%   case 4
-%     sys=mdlGetTimeOfNextVarHit(t,x,u);
-
-%   case 9
-%     sys=mdlTerminate(t,x,u);
+    
+    case 0
+        [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes;
+        
+    case 1
+        sys=mdlDerivatives(t,x,u);
+        
+        %   case 2
+        %     sys=mdlUpdate(t,x,u);
+        
+    case 3
+        sys=mdlOutputs(t,x,u);
+        
+        %   case 4
+        %     sys=mdlGetTimeOfNextVarHit(t,x,u);
+        
+        %   case 9
+        %     sys=mdlTerminate(t,x,u);
     case {2,4,9}
-    sys=[];
-
-  otherwise
-    DAStudio.error('Simulink:blocks:unhandledFlag', num2str(flag));
-
+        sys=[];
+        
+    otherwise
+        DAStudio.error('Simulink:blocks:unhandledFlag', num2str(flag));
+        
 end
 
 
-function [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes
-
-sizes = simsizes;
-sizes.NumContStates  = 0;
-sizes.NumDiscStates  = 0;
-sizes.NumOutputs     = 0;
-sizes.NumInputs      = 4;
-sizes.DirFeedthrough = 0;
-sizes.NumSampleTimes = 1;   % at least one sample time is needed
-
-sys = simsizes(sizes);
-
-x0  = [];
-
-str = [];
-
-ts  = [0 0];
-
-simStateCompliance = 'UnknownSimState';
-end
+    function [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes
+        sizes = simsizes;
+        sizes.NumContStates  = 0;
+        sizes.NumDiscStates  = 0;
+        sizes.NumOutputs     = 3;
+        sizes.NumInputs      = 4;
+        sizes.DirFeedthrough = 1;
+        sizes.NumSampleTimes = 1;   % at least one sample time is needed
+        
+        sys = simsizes(sizes);
+        
+        x0  = [];
+        
+        str = [];
+        
+        ts  = [-1 0];
+        
+        simStateCompliance = 'UnknownSimState';
+    end
 % end mdlInitializeSizes
 
 %
@@ -56,10 +55,10 @@ end
 % Return the derivatives for the continuous states.
 %=============================================================================
 %
-function sys=mdlDerivatives(t,x,u)
-
-sys = [];
-end
+    function sys=mdlDerivatives(t,x,u)
+        
+        sys = [];
+    end
 
 % end mdlDerivatives
 
@@ -71,7 +70,7 @@ end
 %=============================================================================
 %
 % function sys=mdlUpdate(t,x,u)
-% 
+%
 % sys = [];
 
 % end mdlUpdate
@@ -82,10 +81,38 @@ end
 % Return the block outputs.
 %=============================================================================
 %
-function sys=mdlOutputs(t,x,u)
-
-sys = [];
-end
+    function sys=mdlOutputs(t,x,u)
+        global P;
+        global R;
+        global dataMatrix;
+        global dataVector;
+        global lambda;
+        global firOrder;
+        global adaptiveFIRCoef;
+        global accStartTime;
+        global accEndTime;
+        sizeBound=20;
+        phi=u(1:(end-1));
+        y=u(end);
+        if (  t> accStartTime && t< accEndTime )
+            if(numel(dataVector) == sizeBound)
+                P=inv(dataMatrix'*dataMatrix);
+                adaptiveFIRCoef=P*dataMatrix'*dataVector;
+                dataMatrix=[dataMatrix;phi'];
+                dataVector=[dataVector;y];
+            elseif(numel(dataVector)>sizeBound)
+                R=P*phi/(lambda+phi'*P*phi);
+                adaptiveFIRCoef=adaptiveFIRCoef+R*(y-phi'*adaptiveFIRCoef)/lambda;
+                P=(eye(numel(phi))-R*phi')*P/lambda;
+            else
+                dataMatrix=[dataMatrix;phi'];
+                dataVector=[dataVector;y];
+            end
+        end
+        for i=1:firOrder
+            sys(i) = adaptiveFIRCoef(i);
+        end
+    end
 % end mdlOutputs
 
 %
@@ -98,7 +125,7 @@ end
 %=============================================================================
 %
 % function sys=mdlGetTimeOfNextVarHit(t,x,u)
-% 
+%
 % sampleTime = 1;    %  Example, set the next hit to be one second later.
 % sys = t + sampleTime;
 
@@ -111,7 +138,7 @@ end
 %=============================================================================
 %
 % function sys=mdlTerminate(t,x,u)
-% 
+%
 % sys = [];
 
 % end mdlTerminate
