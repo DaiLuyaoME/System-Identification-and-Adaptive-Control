@@ -1,4 +1,4 @@
-function [sys,x0,str,ts,simStateCompliance] = adaptiveLaw(t,x,u,flag)
+function [sys,x0,str,ts,simStateCompliance] = adaptiveLawWithConstraint(t,x,u,flag)
 
 switch flag
     
@@ -94,12 +94,15 @@ end
         global accEndTime;
         global dccStartTime;
         global dccEndTime;
-        lambda=1;
+        lambda=0.98;
         sizeBound=20;
         phi=u(1:firOrder);
         y=u(firOrder+1);
-        if (  abs(u(end))>3e-7 && t> accStartTime && t< accEndTime || t>dccStartTime && t<dccEndTime)
-%             if(t>0.0037&&t<0.009|| t>0.028&&t<0.034||t>0.103 && t<0.108||t>0.128&&t<0.135)
+        adaptiveFIRCoef(2)=adaptiveFIRCoef(1)/2;
+        %         if (  abs(u(end))>3e-7 && t> accStartTime && t< accEndTime || t>dccStartTime && t<dccEndTime)
+        %             if(t>0.0037&&t<0.009|| t>0.028&&t<0.034||t>0.103 && t<0.108||t>0.128&&t<0.135)
+        if (  abs(u(end))>3e-7 && t> accStartTime && t< 0.024)
+            
             if(numel(dataVector) == sizeBound)
                 P=inv(dataMatrix'*dataMatrix);
                 adaptiveFIRCoef=P*dataMatrix'*dataVector;
@@ -114,6 +117,7 @@ end
                 dataVector=[dataVector;y];
             end
         end
+        adaptiveFIRCoef(2)=adaptiveFIRCoef(1)/2;
         for i=1:firOrder
             sys(i) = adaptiveFIRCoef(i);
         end

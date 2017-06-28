@@ -1,9 +1,9 @@
-function [sys,x0,str,ts,simStateCompliance] = adaptiveLaw(t,x,u,flag)
+function [sys,x0,str,ts,simStateCompliance] = adaptiveFeedforward(t,x,u,flag)
 
 switch flag
     
     case 0
-        [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes;
+        [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes();
         
     case 1
         sys=mdlDerivatives(t,x,u);
@@ -13,7 +13,7 @@ switch flag
         
     case 3
         sys=mdlOutputs(t,x,u);
-        
+        %
         %   case 4
         %     sys=mdlGetTimeOfNextVarHit(t,x,u);
         
@@ -28,13 +28,13 @@ switch flag
 end
 
 
-    function [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes
+    function [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes()
         global firOrder;
         sizes = simsizes;
         sizes.NumContStates  = 0;
         sizes.NumDiscStates  = 0;
-        sizes.NumOutputs     = firOrder;
-        sizes.NumInputs      = firOrder+4;
+        sizes.NumOutputs     = 1;
+        sizes.NumInputs      = firOrder;
         sizes.DirFeedthrough = 1;
         sizes.NumSampleTimes = 1;   % at least one sample time is needed
         
@@ -48,6 +48,7 @@ end
         
         simStateCompliance = 'UnknownSimState';
     end
+
 % end mdlInitializeSizes
 
 %
@@ -60,7 +61,6 @@ end
         
         sys = [];
     end
-
 % end mdlDerivatives
 
 %
@@ -83,40 +83,19 @@ end
 %=============================================================================
 %
     function sys=mdlOutputs(t,x,u)
-        global P;
-        global R;
-        global dataMatrix;
-        global dataVector;
-        global lambda;
-        global firOrder;
+        %     fprintf('count is %d \n',count);
+        % u(1)=snap
+        % u(2)=jerk;
+        % u(3)=acc;
+        % u(4)=vel;
+        
         global adaptiveFIRCoef;
-        global accStartTime;
-        global accEndTime;
-        global dccStartTime;
-        global dccEndTime;
-        lambda=1;
-        sizeBound=20;
-        phi=u(1:firOrder);
-        y=u(firOrder+1);
-        if (  abs(u(end))>3e-7 && t> accStartTime && t< accEndTime || t>dccStartTime && t<dccEndTime)
-%             if(t>0.0037&&t<0.009|| t>0.028&&t<0.034||t>0.103 && t<0.108||t>0.128&&t<0.135)
-            if(numel(dataVector) == sizeBound)
-                P=inv(dataMatrix'*dataMatrix);
-                adaptiveFIRCoef=P*dataMatrix'*dataVector;
-                dataMatrix=[dataMatrix;phi'];
-                dataVector=[dataVector;y];
-            elseif(numel(dataVector)>sizeBound)
-                R=P*phi/(lambda+phi'*P*phi);
-                adaptiveFIRCoef=adaptiveFIRCoef+R*(y-phi'*adaptiveFIRCoef)/lambda;
-                P=(eye(numel(phi))-R*phi')*P/lambda;
-            else
-                dataMatrix=[dataMatrix;phi'];
-                dataVector=[dataVector;y];
-            end
-        end
-        for i=1:firOrder
-            sys(i) = adaptiveFIRCoef(i);
-        end
+        % sys=coef'*temp;
+        sys=u'*adaptiveFIRCoef;
+        % count=count+1;
+        
+        
+        
     end
 % end mdlOutputs
 
@@ -142,13 +121,9 @@ end
 % Perform any end of simulation tasks.
 %=============================================================================
 %
-
-end
 function sys=mdlTerminate(t,x,u)
-global dataMatrix;
-global dataVector;
-% dataMatrix=[];
-% dataVector=[];
+
 sys = [];
 
+end mdlTerminate
 end

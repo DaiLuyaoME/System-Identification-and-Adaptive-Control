@@ -33,7 +33,7 @@ plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','Acceleration','LineWidt
 legend1 = legend(gca,'show');
 %% 绘制误差和加速度轨迹
 close all;
-disName={'PID Error',' ',' ','leadErr'};
+disName={'跟踪误差',' ',' ','跟踪误差'};
 switch controllerFlag
     case 1
         Err=pidErr;
@@ -48,6 +48,8 @@ temp1=max(abs(Err.signals.values*1e9));
 temp2=max(abs(acc.signals.values));
 ratioAcc=0.5*temp1/temp2;
 plot(acc.time,ratioAcc*acc.signals.values,'DisplayName','缩放后的加速度形状','LineWidth',2);
+plot(noise.time,noise.signals.values*1e9,'DisplayName','噪声','LineWidth',2);
+grid on;
 legend(gca,'show');
 
 % temp1=max(abs(pidErr.signals.values));

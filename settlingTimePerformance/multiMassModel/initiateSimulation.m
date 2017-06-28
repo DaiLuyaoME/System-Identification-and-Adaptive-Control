@@ -17,13 +17,15 @@ switch modelType
     case 2
         mass=[20,5];
         totalMass=sum(mass);
-        fr=700;
+        fr=200;
         Gp = createPlantModel(mass,fr,modelType);
 end
 [numGp,denGp] = tfdata(Gp,'v');
 %% 反馈控制器设计
 controllerFlag=2;
 Gc = totalMass*createFeedbackController(controllerFlag);
+load leadTwoMass.mat;
+pd=leadTwoMass;
 Gc = totalMass*tf(pd);
 [numGc,denGc] = tfdata(Gc,'v');
 %% 测量噪声
@@ -32,3 +34,6 @@ TsN=1e-5;
 sigma = 10e-9;%噪声的标准差，单位m
 varNoise=sigma*sigma;%注意，白噪声的模块中的Noise Power 需要填成varNoise*Ts
 noisePower=varNoise*TsN;
+%% snap前馈系数
+snapCoef = totalMass/(fr*2*pi)^2;
+

@@ -34,15 +34,21 @@ legend1 = legend(gca,'show');
 %% 绘制误差和加速度轨迹
 close all;
 disName={'PID Error','leadErr'};
-
-
-plotError(Err.time,Err.signals.values*1e9,'控制误差');
+plotError(Err.time,Err.signals.values*1e9,'跟踪误差');
 hold on;
-plotError(noise.time,noise.signals.values*1e9,'噪声');
+% plotError(noise.time,noise.signals.values*1e9,'噪声');
 temp1=max(abs(Err.signals.values*1e9));
 temp2=max(abs(acc.signals.values));
+temp3=max(abs(jerk.signals.values));
+temp4=max(abs(snap.signals.values));
 ratio=0.5*temp1/temp2;
-plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+ratio13=temp1/temp3;
+ratio14=temp1/temp4;
+plot(acc.time,ratio*acc.signals.values,'DisplayName','加速度(缩放后)','LineWidth',2);
+% plot(jerk.time,ratio13*jerk.signals.values,'DisplayName','Jerk(缩放后)','LineWidth',2);
+plot(snap.time,-ratio14*snap.signals.values,'DisplayName','Snap取反(缩放后)','LineWidth',2);
+
+axis tight;
 
 legend(gca,'show');
 

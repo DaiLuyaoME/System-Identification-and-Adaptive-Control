@@ -1,4 +1,4 @@
-% clear all;
+clear all;
 close all;
 clc;
 %%
@@ -8,7 +8,7 @@ Ts=1/fs;%采样周期
 %% 生成被控对象模型
 % flag == 1 刚体模型
 % flag == 2 双质量块模型
-modelType=2;
+modelType=1;
 switch modelType
     case 1
         mass=25;
@@ -51,40 +51,48 @@ firCoef=[1 -2 1]*a;
 temp=20*tf([1,0 0],1);
 temp=c2d(temp,Ts,'tustin');
 [numIIR,denIIR]=tfdata(temp,'v');
+
+c=totalMass/(Ts*Ts);
+accFir=c*[1 -2 1];
+jerkFir=c*[1 -3 3 -1];
+snapFir=c*[1 -4 6 -4 1];
+crackleFir=1.5/(fr*2*pi*Ts)^2*[1 -5 10 -10 5 -1];
+
 %% 自适应FIR滤波器初始化
 global firOrder;
-firOrder=3;
+firOrder=2;
 global lambda;
 global adaptiveFIRCoef;
+% adaptiveFIRCoef=F2'*0.8;
 adaptiveFIRCoef=zeros(firOrder,1);
 lambda=1;
 
 %% 测量噪声
 %白噪声模块用的采用频率，需要大于系统的运行频率
 TsN=1e-5;
-sigma = 10e-9;%噪声的标准差，单位m
+sigma = 0e-9;%噪声的标准差，单位m
 varNoise=sigma*sigma;%注意，白噪声的模块中的Noise Power 需要填成varNoise*Ts
 noisePower=varNoise*TsN;
 %% 设置Simulink模型的传递函数
 % mode: 1 连续模式；2 离散模式
-mode=2;
-switch mode
-    case 1
-        replace_block('main_adaptive/feedback controller','DiscreteTransferFcn','TransferFcn','noprompt');
-        set_param('main_adaptive/feedback controller/feedbackController','Denominator','denGc');
-        set_param('main_adaptive/feedback controller/feedbackController','Numerator','numGc');
-        
-        replace_block('main_adaptive/plant model','DiscreteTransferFcn','TransferFcn','noprompt');
-        set_param('main_adaptive/plant model/plantModel','Denominator','denGp');
-        set_param('main_adaptive/plant model/plantModel','Numerator','numGp');
-        
-    case 2
-        replace_block('main_adaptive/feedback controller','TransferFcn','DiscreteTransferFcn','noprompt');
-        set_param('main_adaptive/feedback controller/feedbackController','Denominator','denGcDis');
-        set_param('main_adaptive/feedback controller/feedbackController','Numerator','numGcDis');
-        set_param('main_adaptive/feedback controller/feedbackController','SampleTime','Ts');
-        %         replace_block('main/plant model','TransferFcn','DiscreteTransferFcn','noprompt');
-        %         set_param('main/plant model/plantModel','Denominator','denGpDis');
-        %         set_param('main/plant model/plantModel','Numerator','numGpDis');
-        %
-end
+% mode=2;
+% switch mode
+%     case 1
+%         replace_block('main_adaptive/feedback controller','DiscreteTransferFcn','TransferFcn','noprompt');
+%         set_param('main_adaptive/feedback controller/feedbackController','Denominator','denGc');
+%         set_param('main_adaptive/feedback controller/feedbackController','Numerator','numGc');
+%         
+%         replace_block('main_adaptive/plant model','DiscreteTransferFcn','TransferFcn','noprompt');
+%         set_param('main_adaptive/plant model/plantModel','Denominator','denGp');
+%         set_param('main_adaptive/plant model/plantModel','Numerator','numGp');
+%         
+%     case 2
+%         replace_block('main_adaptive/feedback controller','TransferFcn','DiscreteTransferFcn','noprompt');
+%         set_param('main_adaptive/feedback controller/feedbackController','Denominator','denGcDis');
+%         set_param('main_adaptive/feedback controller/feedbackController','Numerator','numGcDis');
+%         set_param('main_adaptive/feedback controller/feedbackController','SampleTime','Ts');
+%         %         replace_block('main/plant model','TransferFcn','DiscreteTransferFcn','noprompt');
+%         %         set_param('main/plant model/plantModel','Denominator','denGpDis');
+%         %         set_param('main/plant model/plantModel','Numerator','numGpDis');
+%         %
+% end

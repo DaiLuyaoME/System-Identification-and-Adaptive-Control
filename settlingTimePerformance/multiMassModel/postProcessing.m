@@ -41,8 +41,11 @@ hold on;
 
 temp1=max(abs(Err.signals.values*1e9));
 temp2=max(abs(acc.signals.values));
+temp3=max(abs(snap.signals.values));
 ratio=0.5*temp1/temp2;
+ratio31=temp1/temp3;
 plot(acc.time,ratio*acc.signals.values,'DisplayName','Acceleration','LineWidth',2);
+plot(snap.time,ratio31*snap.signals.values,'DisplayName','Snap','LineWidth',2);
 legend(gca,'show');
 
 %% 绘制指定时间段误差和加速度轨迹

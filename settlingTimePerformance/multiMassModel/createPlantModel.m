@@ -15,8 +15,8 @@ switch flag
         w1=f1*2*pi;
         z1=0.01;
         G1=tf(1,[m,0,0]);
-        G2=tf(w1*w1,[1,2*z1*w1,w1*w1]);
-        Gp=G1*G2;
+        G2=tf([2*z1*w1 w1*w1],[1,2*z1*w1,w1*w1]);
+        Gp=1e9*G1*G2;
         
 end
 

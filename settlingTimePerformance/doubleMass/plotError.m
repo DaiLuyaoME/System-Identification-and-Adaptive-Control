@@ -9,7 +9,7 @@ h=plot(time,data,'DisplayName',label,'LineWidth',2);
 xlabel('$Time\left( s \right)$','Interpreter','latex','FontSize',20);
 
 % 创建 title
-title('控制误差');
+% title('控制误差');
 
 % 创建 ylabel
 ylabel('$e\left( t \right)\left( nm \right)$','Interpreter','latex','FontSize',20);

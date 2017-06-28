@@ -34,7 +34,7 @@ end
         sizes.NumContStates  = 0;
         sizes.NumDiscStates  = 0;
         sizes.NumOutputs     = firOrder;
-        sizes.NumInputs      = firOrder+4;
+        sizes.NumInputs      = firOrder+3;
         sizes.DirFeedthrough = 1;
         sizes.NumSampleTimes = 1;   % at least one sample time is needed
         
@@ -83,36 +83,55 @@ end
 %=============================================================================
 %
     function sys=mdlOutputs(t,x,u)
-        global P;
-        global R;
-        global dataMatrix;
-        global dataVector;
-        global lambda;
-        global firOrder;
-        global adaptiveFIRCoef;
-        global accStartTime;
-        global accEndTime;
-        global dccStartTime;
-        global dccEndTime;
-        lambda=1;
+        global accP;global jerkP;global accR;global jerkR;global dataMatrixAcc; global dataVectorAcc;
+        global dataMatrixJerk;global dataVectorJerk; global lambda;
+        global firOrder; global adaptiveFIRCoef;  global accStartTime;
+        global accConstantAccStartTime; global accConstantAccEndTime; global dccEndTime;
+        global firstAccConstantJerkStartTime;global firstAccConstantJerkEndTime;
+        global secondAccConstantJerkStartTime;global secondAccConstantJerkEndTime;
+        adaptiveMode=0;
         sizeBound=20;
-        phi=u(1:firOrder);
-        y=u(firOrder+1);
-        if (  abs(u(end))>3e-7 && t> accStartTime && t< accEndTime || t>dccStartTime && t<dccEndTime)
-%             if(t>0.0037&&t<0.009|| t>0.028&&t<0.034||t>0.103 && t<0.108||t>0.128&&t<0.135)
-            if(numel(dataVector) == sizeBound)
-                P=inv(dataMatrix'*dataMatrix);
-                adaptiveFIRCoef=P*dataMatrix'*dataVector;
-                dataMatrix=[dataMatrix;phi'];
-                dataVector=[dataVector;y];
-            elseif(numel(dataVector)>sizeBound)
-                R=P*phi/(lambda+phi'*P*phi);
-                adaptiveFIRCoef=adaptiveFIRCoef+R*(y-phi'*adaptiveFIRCoef)/lambda;
-                P=(eye(numel(phi))-R*phi')*P/lambda;
-            else
-                dataMatrix=[dataMatrix;phi'];
-                dataVector=[dataVector;y];
-            end
+        if( t>accConstantAccStartTime && t<accConstantAccEndTime)
+            adaptiveMode=1;%学习加速度前馈系数
+        elseif(t>firstAccConstantJerkStartTime&&t<firstAccConstantJerkEndTime||t>secondAccConstantJerkStartTime&&t<secondAccConstantJerkEndTime)
+            adaptiveMode=2;%学习jerk前馈系数
+        else
+            adaptiveMode=0;
+        end
+        lambda=1;
+        switch adaptiveMode
+            case 1
+                phi=u(adaptiveMode);
+                y=u(end-2)-u(end);
+                if(numel(dataVectorAcc) == sizeBound)
+                    accP=inv(dataMatrixAcc'*dataMatrixAcc);
+                    adaptiveFIRCoef(adaptiveMode)=accP*dataMatrixAcc'*dataVectorAcc;
+                    dataMatrixAcc=[dataMatrixAcc;phi'];
+                    dataVectorAcc=[dataVectorAcc;y];
+                elseif(numel(dataVectorAcc)>sizeBound)
+                    accR=accP*phi/(lambda+phi'*accP*phi);
+                    adaptiveFIRCoef(adaptiveMode)=adaptiveFIRCoef(adaptiveMode)+accR*(y-phi'*adaptiveFIRCoef(adaptiveMode))/lambda;
+                    accP=(eye(numel(phi))-accR*phi')*accP/lambda;
+                else
+                    dataMatrixAcc=[dataMatrixAcc;phi'];
+                    dataVectorAcc=[dataVectorAcc;y];
+                end
+            case 2
+                phi=u(adaptiveMode);
+                y=u(end-2)-u(end-1);
+                if(numel(dataVectorJerk) == sizeBound)
+                    jerkP=inv(dataMatrixJerk'*dataMatrixJerk);
+                    adaptiveFIRCoef(adaptiveMode)=jerkP*dataMatrixJerk'*dataVectorJerk;
+                    dataMatrixJerk=[dataMatrixJerk;phi'];
+                    dataVectorJerk=[dataVectorJerk;y];
+                elseif(numel(dataVectorJerk)>sizeBound)
+                    jerkR=jerkP*phi/(lambda+phi'*jerkP*phi);
+                    adaptiveFIRCoef(adaptiveMode)=adaptiveFIRCoef(adaptiveMode)+jerkR*(y-phi'*adaptiveFIRCoef(adaptiveMode))/lambda;
+                    jerkP=(eye(numel(phi))-jerkR*phi')*jerkP/lambda;
+                else
+                    dataMatrixJerk=[dataMatrixJerk;phi'];
+                    dataVectorJerk=[dataVectorJerk;y];
+                end
         end
         for i=1:firOrder
             sys(i) = adaptiveFIRCoef(i);

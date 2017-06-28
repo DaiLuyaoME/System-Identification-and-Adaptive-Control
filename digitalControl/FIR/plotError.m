@@ -6,13 +6,14 @@ h=plot(time,data,'DisplayName',label,'LineWidth',2);
 % h.LineWidth=2;
 
 % 创建 xlabel
-xlabel('$Time\left( s \right)$ ','Interpreter','latex','FontSize',20);
+% xlabel('$Time\left( s \right)$ ','Interpreter','latex','FontSize',20);
+xlabel('时间(s)','FontSize',20);
 
 % 创建 title
 % title('控制误差');
 
 % 创建 ylabel
-ylabel('$e/nm$','Interpreter','latex','FontSize',20);
+ylabel('跟踪误差(nm)','FontSize',20);
 
 % 设置其余坐标轴属性
 set(gca,'FontSize',16);

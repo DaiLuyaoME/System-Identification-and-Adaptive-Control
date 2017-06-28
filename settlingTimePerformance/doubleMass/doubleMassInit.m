@@ -10,14 +10,14 @@ global k;
 
 m1=10;%台子质量
 m2=5; %驱动器质量
-fn=700; %双质量块模型共振频率
+fn=1500; %双质量块模型共振频率
 wn=fn*2*pi;
 k=wn*wn*m1*m2/(m1+m2);
 
 fs=5000*2;%采样频率
 Ts=1/fs;%采样周期
 
-snapCoef=(m1-0.5)*(m2-0.5)/k;
+snapCoef=(m1-0.1)*(m2)/k;
 
 %% 被控双质量块传递函数模型
 numGp=k;
@@ -27,7 +27,7 @@ Gp=tf(numGp,denGp);
 
 %% Bulter那篇文章给出的PID+低通滤波的控制器设计
 m=m1+m2; % mass/kg
-fbw=120; % desired bandwidth/Hz
+fbw=200; % desired bandwidth/Hz
 alpha=3; % ratio
 kp=m*(2*pi*fbw)^2/alpha; %proportional gain
 fi=fbw/alpha^2;% integrator frequency
@@ -86,6 +86,7 @@ switch controllerFlag
 end
 %% 测量噪声
 %白噪声模块用的采用频率，需要大于系统的运行频率
-sigma = 2.5e-9;%噪声的标准差，单位m
+TsNoise=Ts/2;
+sigma = 3.5e-9;%噪声的标准差，单位m
 varNoise=sigma*sigma;%注意，白噪声的模块中的Noise Power 需要填成varNoise*Ts
-noisePower=varNoise*Ts;
+noisePower=varNoise*TsNoise;
